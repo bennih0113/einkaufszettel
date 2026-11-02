@@ -18,20 +18,24 @@
 :root{
   --bg:#eef2f1; --paper:#ffffff; --ink:#18302c; --muted:#5d7270; --line:#d6e0de;
   --accent:#16695c; --accent-ink:#ffffff; --done:#9aaba8; --danger:#b23a3a;
+  /* Ladenfarben */
+  --s0:#7b8a88; --s1:#c27c0e; --s2:#c2415b; --s3:#2f6db5; --s4:#7a52b3; --s5:#5f8a1f; --s6:#b4561f; --s7:#1f8a8a;
   --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
   --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root{
   --bg:#0f1716; --paper:#172221; --ink:#e3ecea; --muted:#93a8a5; --line:#2a3a38;
-  --accent:#4fb8a5; --accent-ink:#0b1a17; --done:#5f7471; --danger:#e07272; color-scheme:dark}}
+  --accent:#4fb8a5; --accent-ink:#0b1a17; --done:#5f7471; --danger:#e07272;
+  --s0:#8fa3a0; --s1:#e6a63a; --s2:#ec6f88; --s3:#6aa2e8; --s4:#a888dd; --s5:#93c25a; --s6:#e58a52; --s7:#4fc4c4;
+  color-scheme:dark}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.4;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
-.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
 h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,7vw,40px);letter-spacing:-.02em;margin:0}
 .status{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:6px}
@@ -39,25 +43,57 @@ h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,7vw,40px);let
 .dot.live{background:var(--accent)}
 .dot.wait{background:#d49a2a}
 
-form.add{display:flex;gap:10px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:6px}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
-input[type=text]{flex:1;min-width:0;font:inherit;font-size:19px;padding:14px 16px;border:2px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink)}
-input[type=text]:focus{outline:none;border-color:var(--accent)}
-.btn{font:inherit;font-weight:700;border:0;border-radius:12px;cursor:pointer;padding:0 20px;min-height:52px}
-.btn-add{background:var(--accent);color:var(--accent-ink);font-size:28px;line-height:1;padding:0 22px}
-button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/* Reiter oben: Filter nach Laden */
+.tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px));padding-block:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;display:flex;align-items:center;gap:8px;font:inherit;font-size:16px;font-weight:700;border:2px solid var(--line);background:var(--paper);color:var(--ink);
+  border-radius:999px;padding:8px 14px;min-height:44px;cursor:pointer}
+.tab .n{font-variant-numeric:tabular-nums;font-weight:400;color:var(--muted);font-size:14px}
+.tab[aria-pressed="true"]{background:var(--sc,var(--accent));border-color:var(--sc,var(--accent));color:var(--paper)}
+.tab[aria-pressed="true"] .n{color:var(--paper);opacity:.85}
+.sdot{width:11px;height:11px;border-radius:50%;background:var(--sc);flex:none}
+.tab[aria-pressed="true"] .sdot{background:var(--paper)}
 
+/* Eingabe */
+.adder{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:6px;display:flex;flex-direction:column;gap:8px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+form.add{display:flex;gap:10px}
+input[type=text]{flex:1;min-width:0;font:inherit;font-size:19px;padding:14px 16px;border:2px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink)}
+input[type=text]:focus{outline:none;border-color:var(--sc,var(--accent))}
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;cursor:pointer;padding:0 20px;min-height:52px}
+.btn-add{background:var(--sc,var(--accent));color:var(--paper);font-size:28px;line-height:1;padding:0 22px}
+.target{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.chip{display:flex;align-items:center;gap:6px;font:inherit;font-size:14px;font-weight:700;border:1.5px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:6px 11px;min-height:36px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--sc);background:color-mix(in srgb,var(--sc) 16%,transparent)}
+.chip.plus{color:var(--muted);font-size:18px;padding:4px 12px}
+button:focus-visible,.tab:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* Neuer Laden */
+.newshop{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.newshop form{display:flex;gap:10px}
+.newshop .btn{min-height:48px}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.customs{display:flex;flex-wrap:wrap;gap:6px;font-size:14px;color:var(--muted);align-items:center}
+.customs .chip{cursor:pointer}
+
+/* Zettel */
 .sheet{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.group + .group{border-top:1px solid var(--line)}
 .label{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
-  display:flex;justify-content:space-between;align-items:center;padding:12px 16px 6px}
+  display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px 6px}
+.label .name{display:flex;align-items:center;gap:8px}
+.group .label{color:var(--sc);border-left:5px solid var(--sc);padding-left:11px}
 .count{font-variant-numeric:tabular-nums}
 ul{list-style:none;margin:0;padding:0}
 .row{display:flex;align-items:center;border-top:1px solid var(--line)}
+.group .row{border-left:5px solid color-mix(in srgb,var(--sc) 35%,transparent)}
 .row:first-child{border-top:0}
-.toggle{flex:1;min-width:0;display:flex;align-items:center;gap:14px;background:none;border:0;font:inherit;color:inherit;text-align:left;padding:14px 16px;cursor:pointer;min-height:58px;-webkit-tap-highlight-color:transparent}
-.box{flex:none;width:28px;height:28px;border:2.5px solid var(--accent);border-radius:8px;display:grid;place-items:center}
+.toggle{flex:1;min-width:0;display:flex;align-items:center;gap:14px;background:none;border:0;font:inherit;color:inherit;text-align:left;padding:14px 16px;cursor:pointer;min-height:58px;
+  -webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.box{flex:none;width:28px;height:28px;border:2.5px solid var(--sc,var(--accent));border-radius:8px;display:grid;place-items:center}
 .box svg{width:18px;height:18px;opacity:0;color:var(--paper)}
 .text{overflow-wrap:anywhere}
+.tag{display:inline-block;margin-left:8px;font-size:13px;font-weight:700;color:var(--sc);white-space:nowrap}
 .done .box{background:var(--done);border-color:var(--done)}
 .done .box svg{opacity:1}
 .done .text{text-decoration:line-through;text-decoration-thickness:2px;color:var(--done)}
@@ -69,17 +105,25 @@ ul{list-style:none;margin:0;padding:0}
 .btn-ghost{background:none;border:2px solid var(--line);color:var(--ink);min-height:44px;font-size:15px}
 .btn-danger{background:var(--danger);color:#fff;min-height:44px;font-size:15px}
 .confirm-text{font-size:15px;color:var(--muted)}
+.hint{font-size:13px;color:var(--muted);text-align:center}
 .notice{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--danger);border-radius:10px;padding:12px 14px;font-size:15px}
 
 .setup{display:flex;flex-direction:column;gap:12px;padding:18px 16px}
 .setup p{margin:0;color:var(--muted)}
 .setup form{display:flex;gap:10px;flex-wrap:wrap}
-.btn-primary{background:var(--accent);color:var(--accent-ink)}
+
+/* Verschieben-Blatt */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+.picker{background:var(--paper);color:var(--ink);width:100%;max-width:620px;border-radius:18px 18px 0 0;
+  padding:18px max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:12px}
+.picker h2{font-family:var(--display);font-size:20px;margin:0;overflow-wrap:anywhere}
+.picker .chips{display:flex;flex-wrap:wrap;gap:8px}
+.picker .chip{font-size:16px;min-height:48px;padding:8px 16px}
 
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);
   border-radius:12px;padding:10px 10px 10px 16px;display:flex;gap:14px;align-items:center;font-size:16px;max-width:calc(100% - 32px);z-index:20}
 .toast button{background:none;border:0;color:var(--bg);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;padding:8px}
-@media (prefers-reduced-motion:no-preference){.row{transition:background .15s}.row:active{background:var(--bg)}}
+@media (prefers-reduced-motion:no-preference){.row{transition:background .15s}.row:active{background:var(--bg)}.picker{animation:up .18s ease-out}@keyframes up{from{transform:translateY(30px);opacity:.5}}}
 </style>
 </head>
 <body>
@@ -103,22 +147,43 @@ ul{list-style:none;margin:0;padding:0}
   </section>
 
   <div id="app" hidden style="display:contents">
-    <form class="add" id="addForm" autocomplete="off">
-      <input id="newItem" type="text" placeholder="z. B. 2 Liter Milch" aria-label="Neuer Artikel" enterkeyhint="done" maxlength="200">
-      <button class="btn btn-add" type="submit" aria-label="Hinzufügen">+</button>
-    </form>
+    <nav class="tabs" id="tabs" aria-label="Läden"></nav>
 
-    <section class="sheet">
-      <div class="label"><span>Noch holen</span><span class="count" id="openCount"></span></div>
-      <ul id="openList"></ul>
-      <div class="empty" id="openEmpty"></div>
+    <div class="adder" id="adder">
+      <form class="add" id="addForm" autocomplete="off">
+        <input id="newItem" type="text" placeholder="z. B. 2 Liter Milch" aria-label="Neuer Artikel" enterkeyhint="done" maxlength="200">
+        <button class="btn btn-add" type="submit" aria-label="Hinzufügen">+</button>
+      </form>
+      <div class="target" id="target"></div>
+    </div>
+
+    <section class="newshop" id="newShop" hidden>
+      <strong>Neuer Laden</strong>
+      <form id="shopForm" autocomplete="off">
+        <input id="shopName" type="text" placeholder="z. B. Aldi" aria-label="Name des Ladens" maxlength="30">
+        <button class="btn btn-primary" type="submit">Anlegen</button>
+      </form>
+      <div class="customs" id="customs"></div>
+      <button class="btn btn-ghost" type="button" id="shopClose">Fertig</button>
     </section>
+
+    <section class="sheet" id="openSheet"></section>
 
     <section class="sheet" id="doneSheet" hidden>
       <div class="label"><span>Im Wagen</span><span class="count" id="doneCount"></span></div>
       <ul id="doneList"></ul>
       <div class="foot" id="foot"></div>
     </section>
+
+    <p class="hint">Artikel lange gedrückt halten, um ihn einem anderen Laden zuzuordnen.</p>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden>
+  <div class="picker" role="dialog" aria-modal="true" aria-labelledby="pickTitle">
+    <h2 id="pickTitle"></h2>
+    <div class="chips" id="pickChips"></div>
+    <button class="btn btn-ghost" type="button" id="pickCancel">Abbrechen</button>
   </div>
 </div>
 
@@ -141,14 +206,27 @@ const firebaseConfig = {
 const $ = id => document.getElementById(id);
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const CODE_RE = /^[A-Za-z0-9]{24,64}$/;
-let col, db, items = [], confirming = false;
+const CONFIG_ID = "_config";            // Läden-Liste liegt als eigenes Dokument neben den Artikeln
+const GENERAL = { id: "allgemein", name: "Allgemein", color: 0 };
+const BUILTIN = [
+  { id: "edeka", name: "Edeka", color: 1 },
+  { id: "apotheke", name: "Apotheke", color: 2 },
+  { id: "baumarkt", name: "Baumarkt", color: 3 },
+];
+let col, db, items = [], customShops = [], confirming = false;
 let undoData = null, toastTimer = null;
+let filter = load("filter") || "alle";     // welcher Reiter
+let target = load("target") || "edeka";    // wohin neue Artikel gehen
 
-// --- Listen-Code aus Link (#code) oder Gerätespeicher ---
 function store(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
 function load(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
 function extractCode(s){ const m = String(s||"").trim().match(/([A-Za-z0-9]{24,64})\s*$/); return m ? m[1] : null; }
 
+function allShops(){ return [...BUILTIN, ...customShops, GENERAL]; }
+function shopOf(it){ const s = allShops().find(s => s.id === it.shop); return s || GENERAL; }
+function sc(s){ return "var(--s" + (s.color % 8) + ")"; }
+
+// --- Start ---
 let code = extractCode(location.hash.slice(1)) || load("listCode");
 if (code && CODE_RE.test(code)) {
   store("listCode", code);
@@ -170,11 +248,8 @@ function showNotice(msg){ $("notice").textContent = msg || ""; $("notice").hidde
 
 function start(listId){
   const app = initializeApp(firebaseConfig);
-  try {
-    db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
-  } catch(e) {
-    db = initializeFirestore(app, {});
-  }
+  try { db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) }); }
+  catch(e) { db = initializeFirestore(app, {}); }
   col = collection(db, "listen", listId, "items");
   $("app").hidden = false;
   render();
@@ -182,7 +257,10 @@ function start(listId){
   let gotServer = false;
   const slow = setTimeout(() => { if (!gotServer) setStatus("wait", "Offline – Änderungen werden nachgeholt"); }, 8000);
   onSnapshot(col, { includeMetadataChanges: true }, snap => {
-    items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const cfg = all.find(d => d.id === CONFIG_ID);
+    customShops = Array.isArray(cfg?.shops) ? cfg.shops.filter(s => s && s.id && s.name) : [];
+    items = all.filter(d => d.id !== CONFIG_ID);
     if (!snap.metadata.fromCache) { gotServer = true; clearTimeout(slow); }
     if (snap.metadata.hasPendingWrites) setStatus("wait", "Speichert …");
     else if (snap.metadata.fromCache) setStatus("wait", gotServer ? "Offline – Änderungen werden nachgeholt" : "Lädt …");
@@ -197,31 +275,92 @@ function start(listId){
 }
 
 // --- Darstellung ---
-function makeRow(it){
-  const li = document.createElement("li");
-  li.className = "row" + (it.done ? " done" : "");
-  const t = document.createElement("button");
-  t.type = "button"; t.className = "toggle"; t.setAttribute("aria-pressed", it.done ? "true" : "false");
+function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+function renderTabs(){
+  const open = items.filter(i => !i.done);
+  const tabs = [{ id: "alle", name: "Alle" }, ...BUILTIN, ...customShops];
+  if (open.some(i => shopOf(i).id === "allgemein")) tabs.push(GENERAL);
+  if (!tabs.some(t => t.id === filter)) filter = "alle";
+  $("tabs").replaceChildren(...tabs.map(t => {
+    const b = el("button", "tab"); b.type = "button";
+    b.setAttribute("aria-pressed", filter === t.id ? "true" : "false");
+    if (t.id !== "alle") { b.style.setProperty("--sc", sc(t)); b.append(el("span", "sdot")); }
+    b.append(el("span", null, t.name));
+    const n = t.id === "alle" ? open.length : open.filter(i => shopOf(i).id === t.id).length;
+    if (n) b.append(el("span", "n", n));
+    b.onclick = () => {
+      filter = t.id; store("filter", filter);
+      if (t.id !== "alle") { target = t.id; store("target", target); }
+      confirming = false; render();
+    };
+    return b;
+  }));
+}
+
+function renderTarget(){
+  const shops = [...BUILTIN, ...customShops, GENERAL];
+  if (!shops.some(s => s.id === target)) target = "edeka";
+  const t = $("target"); t.replaceChildren(el("span", null, "Kommt auf:"));
+  for (const s of shops){
+    const c = el("button", "chip"); c.type = "button"; c.style.setProperty("--sc", sc(s));
+    c.setAttribute("aria-pressed", target === s.id ? "true" : "false");
+    c.append(el("span", "sdot"), el("span", null, s.name));
+    c.onclick = () => { target = s.id; store("target", target); renderTarget(); $("newItem").focus(); };
+    t.append(c);
+  }
+  const p = el("button", "chip plus", "+"); p.type = "button"; p.setAttribute("aria-label", "Neuen Laden anlegen");
+  p.onclick = () => { $("newShop").hidden = false; renderCustoms(); $("shopName").focus(); };
+  t.append(p);
+  const cur = shops.find(s => s.id === target) || GENERAL;
+  $("adder").style.setProperty("--sc", sc(cur));
+}
+
+function makeRow(it, showTag){
+  const s = shopOf(it);
+  const li = el("li", "row" + (it.done ? " done" : ""));
+  li.style.setProperty("--sc", sc(s));
+  const t = el("button", "toggle"); t.type = "button"; t.setAttribute("aria-pressed", it.done ? "true" : "false");
   t.innerHTML = '<span class="box">' + CHECK + '</span>';
-  const s = document.createElement("span"); s.className = "text"; s.textContent = it.text || ""; t.appendChild(s);
-  t.addEventListener("click", () => toggle(it));
-  const d = document.createElement("button");
-  d.type = "button"; d.className = "del"; d.textContent = "×"; d.setAttribute("aria-label", (it.text||"Artikel") + " löschen");
-  d.addEventListener("click", () => remove(it));
+  const txt = el("span", "text", it.text || "");
+  if (showTag) txt.append(el("span", "tag", s.name));
+  t.append(txt);
+  attachPress(t, () => toggle(it), () => openPicker(it));
+  const d = el("button", "del", "×"); d.type = "button"; d.setAttribute("aria-label", (it.text||"Artikel") + " löschen");
+  d.onclick = () => remove(it);
   li.append(t, d);
   return li;
 }
 
 function render(){
-  const open = items.filter(i => !i.done).sort((a,b) => (a.created||0) - (b.created||0));
-  const done = items.filter(i => i.done).sort((a,b) => (b.doneAt||0) - (a.doneAt||0));
-  $("openList").replaceChildren(...open.map(makeRow));
-  $("doneList").replaceChildren(...done.map(makeRow));
-  $("openEmpty").hidden = open.length > 0;
-  $("openEmpty").innerHTML = done.length
-    ? "Alles abgehakt. <strong>Ab zur Kasse!</strong>"
-    : "Der Zettel ist leer. <strong>Oben eintippen und auf + drücken</strong> – das andere Gerät sieht es sofort.";
-  $("openCount").textContent = open.length || "";
+  renderTabs(); renderTarget();
+  const inView = i => filter === "alle" || shopOf(i).id === filter;
+  const open = items.filter(i => !i.done && inView(i)).sort((a,b) => (a.created||0) - (b.created||0));
+  const done = items.filter(i => i.done && inView(i)).sort((a,b) => (b.doneAt||0) - (a.doneAt||0));
+
+  const sheet = $("openSheet"); sheet.replaceChildren();
+  if (!open.length){
+    const anyDone = done.length > 0;
+    const msg = el("div", "empty");
+    msg.innerHTML = anyDone ? "Alles abgehakt. <strong>Ab zur Kasse!</strong>"
+      : filter === "alle" ? "Der Zettel ist leer. <strong>Oben eintippen und auf + drücken</strong> – das andere Gerät sieht es sofort."
+      : "Hier ist nichts offen.";
+    sheet.append(msg);
+  } else {
+    const groups = filter === "alle" ? allShops() : allShops().filter(s => s.id === filter);
+    for (const s of groups){
+      const list = open.filter(i => shopOf(i).id === s.id);
+      if (!list.length) continue;
+      const g = el("div", "group"); g.style.setProperty("--sc", sc(s));
+      const lab = el("div", "label");
+      const name = el("span", "name"); name.append(el("span", "sdot"), el("span", null, s.name));
+      lab.append(name, el("span", "count", list.length));
+      const ul = el("ul"); ul.append(...list.map(i => makeRow(i, false)));
+      g.append(lab, ul); sheet.append(g);
+    }
+  }
+
+  $("doneList").replaceChildren(...done.map(i => makeRow(i, filter === "alle")));
   $("doneCount").textContent = done.length;
   $("doneSheet").hidden = done.length === 0;
   renderFoot(done.length);
@@ -231,20 +370,82 @@ function renderFoot(n){
   const f = $("foot"); f.replaceChildren();
   if (!n) { confirming = false; return; }
   if (!confirming){
-    const b = document.createElement("button"); b.type = "button"; b.className = "btn btn-ghost";
-    b.textContent = "Abgehakte entfernen"; b.onclick = () => { confirming = true; renderFoot(n); };
+    const b = el("button", "btn btn-ghost", "Abgehakte entfernen"); b.type = "button";
+    b.onclick = () => { confirming = true; renderFoot(n); };
     f.append(b);
   } else {
-    const t = document.createElement("span"); t.className = "confirm-text"; t.textContent = n + " Artikel entfernen?";
-    const no = document.createElement("button"); no.type = "button"; no.className = "btn btn-ghost"; no.textContent = "Abbrechen";
+    const no = el("button", "btn btn-ghost", "Abbrechen"); no.type = "button";
     no.onclick = () => { confirming = false; renderFoot(n); };
-    const yes = document.createElement("button"); yes.type = "button"; yes.className = "btn btn-danger"; yes.textContent = "Entfernen";
+    const yes = el("button", "btn btn-danger", "Entfernen"); yes.type = "button";
     yes.onclick = clearDone;
-    f.append(t, no, yes);
+    f.append(el("span", "confirm-text", n + " Artikel entfernen?"), no, yes);
   }
 }
 
-// --- Aktionen (lokal sofort sichtbar, Sync im Hintergrund) ---
+// --- Tippen vs. lange drücken ---
+function attachPress(btn, onTap, onLong){
+  let timer = null, longFired = false, sx = 0, sy = 0;
+  btn.addEventListener("pointerdown", e => {
+    longFired = false; sx = e.clientX; sy = e.clientY;
+    timer = setTimeout(() => { longFired = true; if (navigator.vibrate) navigator.vibrate(15); onLong(); }, 550);
+  });
+  const cancel = () => { clearTimeout(timer); timer = null; };
+  btn.addEventListener("pointermove", e => { if (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10) cancel(); });
+  btn.addEventListener("pointerup", cancel);
+  btn.addEventListener("pointercancel", cancel);
+  btn.addEventListener("pointerleave", cancel);
+  btn.addEventListener("contextmenu", e => e.preventDefault());
+  btn.addEventListener("click", e => { if (longFired) { longFired = false; e.preventDefault(); return; } onTap(); });
+}
+
+// --- Laden wechseln ---
+function openPicker(it){
+  $("pickTitle").textContent = "„" + it.text + "“ gehört zu …";
+  const cur = shopOf(it).id;
+  $("pickChips").replaceChildren(...allShops().map(s => {
+    const c = el("button", "chip"); c.type = "button"; c.style.setProperty("--sc", sc(s));
+    c.setAttribute("aria-pressed", s.id === cur ? "true" : "false");
+    c.append(el("span", "sdot"), el("span", null, s.name));
+    c.onclick = () => { closePicker(); if (s.id !== cur) updateDoc(doc(col, it.id), { shop: s.id }).catch(fail); };
+    return c;
+  }));
+  $("scrim").hidden = false;
+}
+function closePicker(){ $("scrim").hidden = true; }
+$("pickCancel").onclick = closePicker;
+$("scrim").addEventListener("click", e => { if (e.target === $("scrim")) closePicker(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePicker(); });
+
+// --- Eigene Läden ---
+function renderCustoms(){
+  const c = $("customs"); c.replaceChildren();
+  if (!customShops.length) return;
+  c.append(el("span", null, "Eigene Läden (antippen zum Entfernen):"));
+  for (const s of customShops){
+    const b = el("button", "chip"); b.type = "button"; b.style.setProperty("--sc", sc(s));
+    b.append(el("span", "sdot"), el("span", null, s.name + " ×"));
+    b.onclick = () => saveShops(customShops.filter(x => x.id !== s.id));
+    c.append(b);
+  }
+}
+function saveShops(list){
+  customShops = list; render(); renderCustoms();
+  setDoc(doc(col, CONFIG_ID), { text: "Läden", shops: list }).catch(fail);
+}
+$("shopForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("shopName").value.trim().slice(0, 30);
+  if (!name) return;
+  const id = "s-" + name.toLowerCase().replace(/[^a-z0-9äöüß]+/g, "-").replace(/[äöüß]/g, m => ({ä:"ae",ö:"oe",ü:"ue",ß:"ss"}[m])).replace(/^-|-$/g, "");
+  if (allShops().some(s => s.id === id || s.name.toLowerCase() === name.toLowerCase())) { $("shopName").value = ""; return; }
+  const color = 4 + (customShops.length % 4);
+  $("shopName").value = "";
+  target = id; store("target", target);
+  saveShops([...customShops, { id, name, color }]);
+});
+$("shopClose").onclick = () => { $("newShop").hidden = true; };
+
+// --- Aktionen ---
 function fail(e){ console.error(e); showNotice("Speichern hat nicht geklappt. Bitte nochmal versuchen."); }
 
 $("addForm").addEventListener("submit", e => {
@@ -252,7 +453,7 @@ $("addForm").addEventListener("submit", e => {
   const v = $("newItem").value.trim().slice(0, 200);
   $("newItem").value = ""; $("newItem").focus();
   if (!v || !col) return;
-  addDoc(col, { text: v, done: false, created: Date.now(), doneAt: 0 }).catch(fail);
+  addDoc(col, { text: v, done: false, created: Date.now(), doneAt: 0, shop: target }).catch(fail);
 });
 
 function toggle(it){
@@ -276,7 +477,8 @@ function remove(it){
 }
 function clearDone(){
   confirming = false;
-  const done = items.filter(i => i.done).map(i => ({ ...i }));
+  const inView = i => filter === "alle" || shopOf(i).id === filter;
+  const done = items.filter(i => i.done && inView(i)).map(i => ({ ...i }));
   const b = writeBatch(db);
   for (const it of done) b.delete(doc(col, it.id));
   b.commit().catch(fail);
