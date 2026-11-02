@@ -225,6 +225,13 @@ function extractCode(s){ const m = String(s||"").trim().match(/([A-Za-z0-9]{24,6
 function allShops(){ return [...BUILTIN, ...customShops, GENERAL]; }
 function shopOf(it){ const s = allShops().find(s => s.id === it.shop); return s || GENERAL; }
 function sc(s){ return "var(--s" + (s.color % 8) + ")"; }
+function openCount(id){ return items.filter(i => !i.done && shopOf(i).id === id).length; }
+// Läden mit offenen Artikeln zuerst (die vollsten vorne), leere dahinter – sonst feste Reihenfolge
+function shopsByOpen(){
+  return allShops().map((s, idx) => ({ s, idx, n: openCount(s.id) }))
+    .sort((a, b) => (b.n > 0) - (a.n > 0) || b.n - a.n || a.idx - b.idx)
+    .map(x => x.s);
+}
 
 // --- Start ---
 let code = extractCode(location.hash.slice(1)) || load("listCode");
@@ -279,8 +286,7 @@ function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.c
 
 function renderTabs(){
   const open = items.filter(i => !i.done);
-  const tabs = [{ id: "alle", name: "Alle" }, ...BUILTIN, ...customShops];
-  if (open.some(i => shopOf(i).id === "allgemein")) tabs.push(GENERAL);
+  const tabs = [{ id: "alle", name: "Alle" }, ...shopsByOpen().filter(s => s.id !== "allgemein" || openCount(s.id))];
   if (!tabs.some(t => t.id === filter)) filter = "alle";
   $("tabs").replaceChildren(...tabs.map(t => {
     const b = el("button", "tab"); b.type = "button";
@@ -347,7 +353,7 @@ function render(){
       : "Hier ist nichts offen.";
     sheet.append(msg);
   } else {
-    const groups = filter === "alle" ? allShops() : allShops().filter(s => s.id === filter);
+    const groups = filter === "alle" ? shopsByOpen() : allShops().filter(s => s.id === filter);
     for (const s of groups){
       const list = open.filter(i => shopOf(i).id === s.id);
       if (!list.length) continue;
