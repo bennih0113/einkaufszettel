@@ -141,6 +141,8 @@ const firebaseConfig = {
 const $ = id => document.getElementById(id);
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const CODE_RE = /^[A-Za-z0-9]{24,64}$/;
+let col, db, items = [], confirming = false;
+let undoData = null, toastTimer = null;
 
 // --- Listen-Code aus Link (#code) oder Gerätespeicher ---
 function store(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
@@ -166,8 +168,6 @@ $("setupForm").addEventListener("submit", e => {
 function setStatus(kind, text){ const d = $("dot"); d.className = "dot" + (kind === "live" ? " live" : kind === "wait" ? " wait" : ""); $("statusText").textContent = text; }
 function showNotice(msg){ $("notice").textContent = msg || ""; $("notice").hidden = !msg; }
 
-let col, db, items = [], confirming = false;
-
 function start(listId){
   const app = initializeApp(firebaseConfig);
   try {
@@ -179,8 +179,8 @@ function start(listId){
   $("app").hidden = false;
   render();
 
-  const slow = setTimeout(() => { if (!gotServer) setStatus("wait", "Offline – Änderungen werden nachgeholt"); }, 8000);
   let gotServer = false;
+  const slow = setTimeout(() => { if (!gotServer) setStatus("wait", "Offline – Änderungen werden nachgeholt"); }, 8000);
   onSnapshot(col, { includeMetadataChanges: true }, snap => {
     items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     if (!snap.metadata.fromCache) { gotServer = true; clearTimeout(slow); }
@@ -259,7 +259,6 @@ function toggle(it){
   updateDoc(doc(col, it.id), { done: !it.done, doneAt: !it.done ? Date.now() : 0 }).catch(fail);
 }
 
-let undoData = null, toastTimer = null;
 function toast(msg, data){
   undoData = data; $("toastText").textContent = msg; $("toast").hidden = false;
   clearTimeout(toastTimer); toastTimer = setTimeout(() => { $("toast").hidden = true; undoData = null; }, 6000);
