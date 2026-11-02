@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Einkaufszettel</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Einkauf">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#eef2f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1716" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+:root{
+  --bg:#eef2f1; --paper:#ffffff; --ink:#18302c; --muted:#5d7270; --line:#d6e0de;
+  --accent:#16695c; --accent-ink:#ffffff; --done:#9aaba8; --danger:#b23a3a;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0f1716; --paper:#172221; --ink:#e3ecea; --muted:#93a8a5; --line:#2a3a38;
+  --accent:#4fb8a5; --accent-ink:#0b1a17; --done:#5f7471; --danger:#e07272; color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.4;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,7vw,40px);letter-spacing:-.02em;margin:0}
+.status{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--done)}
+.dot.live{background:var(--accent)}
+.dot.wait{background:#d49a2a}
+
+form.add{display:flex;gap:10px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:6px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+input[type=text]{flex:1;min-width:0;font:inherit;font-size:19px;padding:14px 16px;border:2px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink)}
+input[type=text]:focus{outline:none;border-color:var(--accent)}
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;cursor:pointer;padding:0 20px;min-height:52px}
+.btn-add{background:var(--accent);color:var(--accent-ink);font-size:28px;line-height:1;padding:0 22px}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.label{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  display:flex;justify-content:space-between;align-items:center;padding:12px 16px 6px}
+.count{font-variant-numeric:tabular-nums}
+ul{list-style:none;margin:0;padding:0}
+.row{display:flex;align-items:center;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.toggle{flex:1;min-width:0;display:flex;align-items:center;gap:14px;background:none;border:0;font:inherit;color:inherit;text-align:left;padding:14px 16px;cursor:pointer;min-height:58px;-webkit-tap-highlight-color:transparent}
+.box{flex:none;width:28px;height:28px;border:2.5px solid var(--accent);border-radius:8px;display:grid;place-items:center}
+.box svg{width:18px;height:18px;opacity:0;color:var(--paper)}
+.text{overflow-wrap:anywhere}
+.done .box{background:var(--done);border-color:var(--done)}
+.done .box svg{opacity:1}
+.done .text{text-decoration:line-through;text-decoration-thickness:2px;color:var(--done)}
+.del{flex:none;background:none;border:0;color:var(--muted);width:56px;min-height:58px;font-size:28px;cursor:pointer}
+.del:hover{color:var(--danger)}
+.empty{padding:22px 16px;color:var(--muted)}
+.empty strong{color:var(--ink)}
+.foot{display:flex;justify-content:flex-end;gap:10px;padding:10px 16px 14px;flex-wrap:wrap;align-items:center}
+.btn-ghost{background:none;border:2px solid var(--line);color:var(--ink);min-height:44px;font-size:15px}
+.btn-danger{background:var(--danger);color:#fff;min-height:44px;font-size:15px}
+.confirm-text{font-size:15px;color:var(--muted)}
+.notice{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--danger);border-radius:10px;padding:12px 14px;font-size:15px}
+
+.setup{display:flex;flex-direction:column;gap:12px;padding:18px 16px}
+.setup p{margin:0;color:var(--muted)}
+.setup form{display:flex;gap:10px;flex-wrap:wrap}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);
+  border-radius:12px;padding:10px 10px 10px 16px;display:flex;gap:14px;align-items:center;font-size:16px;max-width:calc(100% - 32px);z-index:20}
+.toast button{background:none;border:0;color:var(--bg);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;padding:8px}
+@media (prefers-reduced-motion:no-preference){.row{transition:background .15s}.row:active{background:var(--bg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Einkaufszettel</h1>
+    <div class="status"><span class="dot" id="dot"></span><span id="statusText">Verbinde …</span></div>
+  </header>
+
+  <div class="notice" id="notice" hidden></div>
+
+  <section class="sheet" id="setup" hidden>
+    <div class="setup">
+      <strong>Welche Liste?</strong>
+      <p>Öffne den Link, den Benni geschickt hat – oder füge ihn hier ein.</p>
+      <form id="setupForm" autocomplete="off">
+        <input id="codeInput" type="text" placeholder="Link oder Code einfügen" aria-label="Link oder Code">
+        <button class="btn btn-primary" type="submit">Öffnen</button>
+      </form>
+    </div>
+  </section>
+
+  <div id="app" hidden style="display:contents">
+    <form class="add" id="addForm" autocomplete="off">
+      <input id="newItem" type="text" placeholder="z. B. 2 Liter Milch" aria-label="Neuer Artikel" enterkeyhint="done" maxlength="200">
+      <button class="btn btn-add" type="submit" aria-label="Hinzufügen">+</button>
+    </form>
+
+    <section class="sheet">
+      <div class="label"><span>Noch holen</span><span class="count" id="openCount"></span></div>
+      <ul id="openList"></ul>
+      <div class="empty" id="openEmpty"></div>
+    </section>
+
+    <section class="sheet" id="doneSheet" hidden>
+      <div class="label"><span>Im Wagen</span><span class="count" id="doneCount"></span></div>
+      <ul id="doneList"></ul>
+      <div class="foot" id="foot"></div>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden><span id="toastText"></span><button id="undoBtn" type="button">Rückgängig</button></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc,
+  addDoc, updateDoc, deleteDoc, setDoc, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC5eGaXPMN6EKTDsVrsinxx-a7mDAQSgp0",
+  authDomain: "einkaufszettel-f866b.firebaseapp.com",
+  projectId: "einkaufszettel-f866b",
+  storageBucket: "einkaufszettel-f866b.firebasestorage.app",
+  messagingSenderId: "376281602979",
+  appId: "1:376281602979:web:7e27b6f1c172e7514a1816"
+};
+
+const $ = id => document.getElementById(id);
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const CODE_RE = /^[A-Za-z0-9]{24,64}$/;
+
+// --- Listen-Code aus Link (#code) oder Gerätespeicher ---
+function store(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
+function load(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+function extractCode(s){ const m = String(s||"").trim().match(/([A-Za-z0-9]{24,64})\s*$/); return m ? m[1] : null; }
+
+let code = extractCode(location.hash.slice(1)) || load("listCode");
+if (code && CODE_RE.test(code)) {
+  store("listCode", code);
+  if (location.hash.slice(1) !== code) history.replaceState(null, "", "#" + code);
+  start(code);
+} else {
+  setStatus("off", "Keine Liste");
+  $("setup").hidden = false;
+}
+$("setupForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const c = extractCode($("codeInput").value);
+  if (!c) { showNotice("Das sieht nicht nach dem richtigen Link aus. Bitte den ganzen Link einfügen."); return; }
+  location.hash = c; location.reload();
+});
+
+function setStatus(kind, text){ const d = $("dot"); d.className = "dot" + (kind === "live" ? " live" : kind === "wait" ? " wait" : ""); $("statusText").textContent = text; }
+function showNotice(msg){ $("notice").textContent = msg || ""; $("notice").hidden = !msg; }
+
+let col, db, items = [], confirming = false;
+
+function start(listId){
+  const app = initializeApp(firebaseConfig);
+  try {
+    db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
+  } catch(e) {
+    db = initializeFirestore(app, {});
+  }
+  col = collection(db, "listen", listId, "items");
+  $("app").hidden = false;
+  render();
+
+  const slow = setTimeout(() => { if (!gotServer) setStatus("wait", "Offline – Änderungen werden nachgeholt"); }, 8000);
+  let gotServer = false;
+  onSnapshot(col, { includeMetadataChanges: true }, snap => {
+    items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (!snap.metadata.fromCache) { gotServer = true; clearTimeout(slow); }
+    if (snap.metadata.hasPendingWrites) setStatus("wait", "Speichert …");
+    else if (snap.metadata.fromCache) setStatus("wait", gotServer ? "Offline – Änderungen werden nachgeholt" : "Lädt …");
+    else { setStatus("live", "Synchron"); showNotice(""); }
+    render();
+  }, err => {
+    clearTimeout(slow); setStatus("off", "Fehler");
+    showNotice(err.code === "permission-denied"
+      ? "Kein Zugriff auf diese Liste. Ist der Link vollständig?"
+      : "Verbindung verloren. Bitte die Seite neu öffnen.");
+  });
+}
+
+// --- Darstellung ---
+function makeRow(it){
+  const li = document.createElement("li");
+  li.className = "row" + (it.done ? " done" : "");
+  const t = document.createElement("button");
+  t.type = "button"; t.className = "toggle"; t.setAttribute("aria-pressed", it.done ? "true" : "false");
+  t.innerHTML = '<span class="box">' + CHECK + '</span>';
+  const s = document.createElement("span"); s.className = "text"; s.textContent = it.text || ""; t.appendChild(s);
+  t.addEventListener("click", () => toggle(it));
+  const d = document.createElement("button");
+  d.type = "button"; d.className = "del"; d.textContent = "×"; d.setAttribute("aria-label", (it.text||"Artikel") + " löschen");
+  d.addEventListener("click", () => remove(it));
+  li.append(t, d);
+  return li;
+}
+
+function render(){
+  const open = items.filter(i => !i.done).sort((a,b) => (a.created||0) - (b.created||0));
+  const done = items.filter(i => i.done).sort((a,b) => (b.doneAt||0) - (a.doneAt||0));
+  $("openList").replaceChildren(...open.map(makeRow));
+  $("doneList").replaceChildren(...done.map(makeRow));
+  $("openEmpty").hidden = open.length > 0;
+  $("openEmpty").innerHTML = done.length
+    ? "Alles abgehakt. <strong>Ab zur Kasse!</strong>"
+    : "Der Zettel ist leer. <strong>Oben eintippen und auf + drücken</strong> – das andere Gerät sieht es sofort.";
+  $("openCount").textContent = open.length || "";
+  $("doneCount").textContent = done.length;
+  $("doneSheet").hidden = done.length === 0;
+  renderFoot(done.length);
+}
+
+function renderFoot(n){
+  const f = $("foot"); f.replaceChildren();
+  if (!n) { confirming = false; return; }
+  if (!confirming){
+    const b = document.createElement("button"); b.type = "button"; b.className = "btn btn-ghost";
+    b.textContent = "Abgehakte entfernen"; b.onclick = () => { confirming = true; renderFoot(n); };
+    f.append(b);
+  } else {
+    const t = document.createElement("span"); t.className = "confirm-text"; t.textContent = n + " Artikel entfernen?";
+    const no = document.createElement("button"); no.type = "button"; no.className = "btn btn-ghost"; no.textContent = "Abbrechen";
+    no.onclick = () => { confirming = false; renderFoot(n); };
+    const yes = document.createElement("button"); yes.type = "button"; yes.className = "btn btn-danger"; yes.textContent = "Entfernen";
+    yes.onclick = clearDone;
+    f.append(t, no, yes);
+  }
+}
+
+// --- Aktionen (lokal sofort sichtbar, Sync im Hintergrund) ---
+function fail(e){ console.error(e); showNotice("Speichern hat nicht geklappt. Bitte nochmal versuchen."); }
+
+$("addForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const v = $("newItem").value.trim().slice(0, 200);
+  $("newItem").value = ""; $("newItem").focus();
+  if (!v || !col) return;
+  addDoc(col, { text: v, done: false, created: Date.now(), doneAt: 0 }).catch(fail);
+});
+
+function toggle(it){
+  updateDoc(doc(col, it.id), { done: !it.done, doneAt: !it.done ? Date.now() : 0 }).catch(fail);
+}
+
+let undoData = null, toastTimer = null;
+function toast(msg, data){
+  undoData = data; $("toastText").textContent = msg; $("toast").hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { $("toast").hidden = true; undoData = null; }, 6000);
+}
+$("undoBtn").addEventListener("click", () => {
+  const d = undoData; $("toast").hidden = true; undoData = null; if (!d) return;
+  const b = writeBatch(db);
+  for (const { id, ...body } of d) b.set(doc(col, id), body);
+  b.commit().catch(fail);
+});
+
+function remove(it){
+  deleteDoc(doc(col, it.id)).catch(fail);
+  toast("„" + it.text + "“ gelöscht", [{ ...it }]);
+}
+function clearDone(){
+  confirming = false;
+  const done = items.filter(i => i.done).map(i => ({ ...i }));
+  const b = writeBatch(db);
+  for (const it of done) b.delete(doc(col, it.id));
+  b.commit().catch(fail);
+  toast(done.length + " Artikel entfernt", done);
+}
+</script>
+</body>
+</html>
